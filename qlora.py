@@ -88,6 +88,13 @@ class ModelArguments:
         default=False,
         metadata={"help": "Enables using Huggingface auth token from Git Credentials."}
     )
+    save_repo: Optional[str] = field(
+        default=None,
+        metadata={"help": "Hugging face model repo for pushing checkpoints"}
+    )
+    push_to_hub_private: Optional[bool] = field(
+        default=True
+    )    
 
 @dataclass
 class DataArguments:
@@ -697,6 +704,14 @@ def train():
     )
     print(args)
     
+    if (args.save_repo and not args.push_to_hub_private) or (args.save_repo and args.use_auth_token):
+        training_args.set_push_to_hub(
+            model_id=args.save_repo, 
+            strategy='all_checkpoints', 
+            token=args.use_auth_token, 
+            private_repo=args.push_to_hub_private
+        )
+
     checkpoint_dir, completed_training = get_last_checkpoint(args.output_dir)
     if completed_training:
         print('Detected that training was already completed!')
