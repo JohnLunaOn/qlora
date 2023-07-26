@@ -88,9 +88,13 @@ class ModelArguments:
         default=False,
         metadata={"help": "Enables using Huggingface auth token from Git Credentials."}
     )
+    hf_auth_token: Optional[str] = field(
+        default=None,
+        metadata={"help": "Huggingface token for pushing to private hub"}
+    )
     save_repo: Optional[str] = field(
         default=None,
-        metadata={"help": "Hugging face model repo for pushing checkpoints"}
+        metadata={"help": "Huggingface model repo for pushing checkpoints"}
     )
     push_to_hub_private: Optional[bool] = field(
         default=True
@@ -704,11 +708,11 @@ def train():
     )
     print(args)
     
-    if (args.save_repo and not args.push_to_hub_private) or (args.save_repo and args.use_auth_token):
+    if (args.save_repo and not args.push_to_hub_private) or (args.save_repo and args.hf_auth_token):
         training_args.set_push_to_hub(
             model_id=args.save_repo, 
             strategy='all_checkpoints', 
-            token=args.use_auth_token, 
+            token=args.hf_auth_token, 
             private_repo=args.push_to_hub_private
         )
 
